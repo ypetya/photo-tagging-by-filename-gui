@@ -1,0 +1,12 @@
+GEM
+  specs:
+    shoes (3.0.1)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  shoes
+
+BUNDLED WITH
+   1.13.7
