@@ -1,4 +1,5 @@
 require 'shoes'
+require './lib'
 
 $MAX_DIR_DEPTH=3
 $original_dir= Dir.pwd
@@ -6,6 +7,7 @@ $work_dir= ARGV[1] || Dir.chdir
 
 Shoes.app(width:1024,height:768) {
   @current_image_index=-1
+  @db = TagLibrary.new($work_dir, Dir.pwd)
   
   stack( margin: 4 ) {
     flow {
@@ -30,7 +32,7 @@ Shoes.app(width:1024,height:768) {
       inscription "Looking up #{$work_dir} for images..."
     }
 
-    start_thread
+    @db.load
   }
 
   def edit_image
@@ -49,7 +51,6 @@ Shoes.app(width:1024,height:768) {
     end
   end
 
-  DEFAULT_TAGS=[ 'mtb', 'mountains', 'travel', 'people', 'profile' ]
   tag_checks=[]
 
   def setup_tag_buttons
@@ -72,7 +73,7 @@ Shoes.app(width:1024,height:768) {
   end
 
   def fname_tags
-    File.basename(@source_images[@current_image_index]).split(/[_.]/)
+    @db.fetch_tags[@current_image_index)
   end
 
   # TODO ordering : keep date upfront!
@@ -121,48 +122,5 @@ Shoes.app(width:1024,height:768) {
     info 'rename file to store tags in filename! not implented yet'
   end
 
-  def start_thread
-    Thread.new {
-      info "New thread is firing up" 
-      @source_images=[]
-
-      Dir.chdir($work_dir)
-
-      lookup_recursively($MAX_DIR_DEPTH) { |dir, file|
-        img = "#{dir}/#{file}"
-        info "Image found #{img}"
-        @source_images.push(img)
-      }
-    
-      Dir.chdir($original_dir)
-      
-      info "Thread finished."
-
-      @output_area.append {
-        para "Total images found #{@source_images.length}"
-      }
-
-      @current_image_index = 0
-      edit_image
-    }
-  end
-
-  def lookup_recursively(maxdepth, &block)
-    return if maxdepth == 0
-    
-    Dir.glob('*.jpg') do |file|
-      yield(Dir.pwd, file)
-    end
-    
-    dirs=Dir.glob('*').select { |f| File.directory? f }
-
-    dirs.each do |dir|
-      # Do not process symlink
-      next if File.symlink? dir
-      Dir.chdir(dir)
-      lookup_recursively(maxdepth-1, &block)
-      Dir.chdir('..')
-    end
-  end
 }
 
