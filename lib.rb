@@ -1,4 +1,4 @@
-#TODO : del btn, display orig dimensions
+#TODO : display orig dimensions
 class TagLibrary
   def initialize(source_dir)
     @source_images=[]
@@ -13,6 +13,12 @@ class TagLibrary
 
   def fetch_item(index)
     @source_images[index]
+  end
+
+  def delete_item(index)
+    file_name=fetch_item(index)
+    File.delete file_name
+    @source_images.delete(file_name)
   end
 
   def fetch_tags(index)
@@ -34,6 +40,8 @@ class TagLibrary
     new_name = proposed_filename(index, tags)
     File.rename( file_name, new_name )
     @source_images[index]=new_name
+  rescue Exception => e
+    error e
   end
 
   def add_tag_option(text)
@@ -93,12 +101,14 @@ class TagLibrary
       # Do not process symlink
       next if File.symlink? dir
       # Do not process cache dirs
-      next if dir =~ /viber|library|^\.git/i
+      next if dir =~ /viber|library|^\.git|AppData/i
       
       Dir.chdir(dir)
       lookup_recursively(maxdepth-1, &block)
       Dir.chdir('..')
     end
+  rescue Exception => e
+    error e
   end
 end
 

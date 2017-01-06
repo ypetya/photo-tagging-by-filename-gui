@@ -84,6 +84,7 @@ Shoes.app(width:1024,height:768) {
     @control_buttons.append do
       @prev_button = button "Prev"
       @next_button = button "Next"
+      @del_button = button "Delete"
       @new_tag = edit_line(width:200)
       @new_tag_button = button 'Add New Tag'
       @del_tag_button = button 'Remove Checked tags'
@@ -99,6 +100,10 @@ Shoes.app(width:1024,height:768) {
     }
     @next_button.click {
       @current_image_index += 1
+      edit_image
+    }
+    @del_button.click {
+      @db.delete_item(@current_image_index)
       edit_image
     }
 
