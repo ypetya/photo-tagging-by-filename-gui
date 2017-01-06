@@ -53,7 +53,9 @@ class TagLibrary
   end
 
   def tag_candidates(index)
-    ( fetch_tags(index) | @tags ).sort
+    tags_from_file = fetch_tags(index)
+    # format = date + other tags sorted
+    [tags_from_file[0] ] | ( tags_from_file[1,tags_from_file.length]  | @tags ).sort
   end
 
   def size

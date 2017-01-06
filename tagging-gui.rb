@@ -66,14 +66,14 @@ Shoes.app(width:1024,height:768) {
     # get the previous selection's tag names
     prev_selected_tags=@tag_checks.select{ |tag, cb | cb.checked? }.map{ |t,c| t }
     # make a union with the tags already in the filename
-    selected_tags= prev_selected_tags | @db.fetch_tags(@current_image_index)
+    #selected_tags= prev_selected_tags #| @db.fetch_tags(@current_image_index)
     @tags.clear
     @tags.append{
       # creates a new [ [tag_name,cb] ... ] array
       @tag_checks= @db.tag_candidates(@current_image_index).map { |tag_name|
         @checkbox = check ; @p = para tag_name
         # mark checked via selected_tags
-        @checkbox.checked = true if selected_tags.include? tag_name
+        @checkbox.checked = true if prev_selected_tags.include? tag_name
         [tag_name, @checkbox]
       }
     }
